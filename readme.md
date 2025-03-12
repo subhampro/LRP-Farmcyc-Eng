@@ -8,7 +8,13 @@ This guide will walk you through setting up SkyPort Panel along with Cloudflare 
 ## **Step 1: Install SkyPort Panel**
 Run the following command to install the SkyPort Panel:
 ```sh
+sudo apt-get install screen
+
+screen -R -D skyport
+
 bash <(curl -fsSL https://raw.githubusercontent.com/SoloPlayzDev/skyport-installer/refs/heads/main/install.sh)
+
+CTRL+A+D --[Exit From Screen]
 ```
 This script will install all necessary dependencies and configure the panel automatically.
 
@@ -42,18 +48,20 @@ cloudflared tunnel create my-tunnel
 ### **4. Configure the Tunnel**
 Create or edit the Cloudflare Tunnel configuration file:
 ```sh
+sudo mkdir -p /etc/cloudflared/
+
 sudo nano /etc/cloudflared/config.yaml
 ```
 Add the following content:
 ```yaml
-tunnel: my-tunnel
+tunnel: my-tunnel-2
 credentials-file: /root/.cloudflared/my-tunnel.json
 ingress:
-  - hostname: panel.yourdomain.com
+  - hostname: panel2.prohostvps.com
     service: http://localhost:3001
   - service: http_status:404
 ```
-Replace `panel.yourdomain.com` with your actual domain and ensure that the port (`3001`) matches your SkyPort Panel setup.
+Replace `panel.prohostvps.com` with your actual domain and ensure that the port (`3001`) matches your SkyPort Panel setup.
 
 ### **5. Add DNS Record in Cloudflare**
 1. Go to **Cloudflare Dashboard** → **DNS Settings**.
@@ -65,21 +73,38 @@ Replace `panel.yourdomain.com` with your actual domain and ensure that the port 
 ### **6. Start Cloudflare Tunnel**
 Run:
 ```sh
+screen -R -D cloudflare
+ls -l /root/.cloudflared --[get fine name here]
+sudo nano /etc/cloudflared/config.yaml --[set file name]
 cloudflared tunnel run my-tunnel
 ```
 To run it in the background:
 ```sh
 nohup cloudflared tunnel run my-tunnel > cloudflared.log 2>&1 &
 ```
-
+Goto Port-Forward > Open The Link > Login Admin > Nodes > Add Node
 ---
 
 ## **Step 3: Install Wings for SkyPort**
 Run the following command to install Wings (SkyPort Daemon):
 ```sh
 bash <(curl -fsSL https://raw.githubusercontent.com/SoloPlayzDev/skyport-installer/refs/heads/main/wings.sh)
+
+cd skyportd
+npm i
+
+Enter config code --[Generate From Node (npm run configure -- --panel http://localhost:3001 --key 681a5ab2-dfe0-4fe5-bfe0-dcef15f633d9 --secret)]
+Processor : AMD EPYC 7763 64-Core Processor
+Memory : 64GB
+Disk : 100GB
+
+screen -R -D wings
+node .
+CTRL+A+D --[Exit From Screen]
 ```
 This script will set up the Wings service required for running game servers.
+
+
 
 ---
 
